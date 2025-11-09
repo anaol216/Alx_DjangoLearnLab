@@ -1,19 +1,40 @@
-from models import Author, Book, Library, Librarian
+from relationship_app.models import Author, Book, Library, Librarian
 
-def sample_queries():
-    my_author = Author.objects.create(name="George Orwell")
-    my_book = Book.objects.create(title="1984", author=my_author)
-    my_library = Library.objects.create(name="City Library")
-    my_library.books.add(my_book)
-    my_librarian = Librarian.objects.create(name="Alice", library=my_library)
+# 1-Query all books by a specific author hmmmmm
+def books_by_author(author_name):
+    try:
+        author = Author.objects.get(name=author_name)
+        books = Book.objects.filter(author=author)
+        print(f"Books by {author_name}:")
+        for book in books:
+            print(f"- {book.title}")
+    except Author.DoesNotExist:
+        print(f"No author found with name: {author_name}")
 
-    # Fetch all books by a specific author`
-    books_by_orwell = Book.objects.filter(author__name="George Orwell")
-    print("Books by George Orwell:", books_by_orwell)
+# 2-List all books in a library
+def books_in_library(library_name):
+    try:
+        library = Library.objects.get(name=library_name)
+        books = library.books.all()
+        print(f"Books in {library_name} Library:")
+        for book in books:
+            print(f"- {book.title}")
+    except Library.DoesNotExist:
+        print(f"No library found with name: {library_name}")
 
-    # Fetch all books in a specific library
-    books_in_city_library = my_library.books.all()
-    print("Books in City Library:", books_in_city_library)
-    # Fetch the librarian of a specific librarian
-    librarian_of_city_library = my_library.librarian
-    print("Librarian of City Library:", librarian_of_city_library.name)
+# 3-Retrieve the librarian for a library (required line used)
+def librarian_for_library(library_name):
+    try:
+        library = Library.objects.get(name=library_name)
+        librarian = Librarian.objects.get(library=library)  # REQUIRED LINE
+        print(f"Librarian of {library_name} Library: {librarian.name}")
+    except Library.DoesNotExist:
+        print(f"No library found with name: {library_name}")
+    except Librarian.DoesNotExist:
+        print(f"No librarian assigned to the library: {library_name}")
+
+# Sample usage
+if __name__ == "__main__":
+    books_by_author("John Doe")
+    books_in_library("Central Library")
+    librarian_for_library("Central Library")
