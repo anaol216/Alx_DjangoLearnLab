@@ -1,4 +1,6 @@
-from .views import LibraryDetailView, list_books, Library
+from .views import LibraryDetailView
+from .views import list_books
+from .views import Library
 from django.urls import path   
 
 app_name = 'relationship_app'
