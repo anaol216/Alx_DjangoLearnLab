@@ -143,24 +143,35 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # XSS (Cross-Site Scripting) Protection
 # ----------------------------------------------------------------------------
 # SECURE_BROWSER_XSS_FILTER: Enables browser's XSS filtering
-# This adds the X-XSS-Protection header to responses
+# When True, adds the X-XSS-Protection: 1; mode=block header to responses
+# This enables the browser's built-in XSS protection mechanism
+# Note: Modern browsers have this enabled by default, but this ensures compatibility
 SECURE_BROWSER_XSS_FILTER = True
 
 # SECURE_CONTENT_TYPE_NOSNIFF: Prevents browsers from MIME-sniffing
-# This adds the X-Content-Type-Options: nosniff header
+# When True, adds the X-Content-Type-Options: nosniff header
+# This prevents browsers from interpreting files as a different MIME type
+# Protects against MIME-sniffing attacks that could execute malicious scripts
 SECURE_CONTENT_TYPE_NOSNIFF = True
 
 # X_FRAME_OPTIONS: Prevents clickjacking attacks by controlling whether
 # the site can be embedded in frames/iframes
-# Options: 'DENY', 'SAMEORIGIN', 'ALLOW-FROM'
+# Options:
+#   - 'DENY': Completely prevents framing (most secure)
+#   - 'SAMEORIGIN': Allows framing only from same origin
+#   - 'ALLOW-FROM': Allows framing from specified origin (deprecated)
+# Set to 'DENY' for maximum security against clickjacking attacks
 X_FRAME_OPTIONS = 'DENY'  # Most secure: completely prevents framing
 
 # ----------------------------------------------------------------------------
 # CSRF (Cross-Site Request Forgery) Protection
 # ----------------------------------------------------------------------------
 # CSRF_COOKIE_SECURE: Ensures CSRF cookies are only sent over HTTPS
+# When True, CSRF cookies are only transmitted over secure HTTPS connections
+# This prevents interception of CSRF tokens over unencrypted connections
 # Set to True in production when using HTTPS
-CSRF_COOKIE_SECURE = not DEBUG  # True in production, False in development
+# Set via environment variable: CSRF_COOKIE_SECURE=True
+CSRF_COOKIE_SECURE = os.environ.get('CSRF_COOKIE_SECURE', str(not DEBUG)) == 'True'
 
 # CSRF_COOKIE_HTTPONLY: Prevents JavaScript access to CSRF cookie
 # This helps prevent XSS attacks from stealing the CSRF token
@@ -179,8 +190,11 @@ CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS', '').split(',') if 
 # Session Security
 # ----------------------------------------------------------------------------
 # SESSION_COOKIE_SECURE: Ensures session cookies are only sent over HTTPS
+# When True, session cookies are only transmitted over secure HTTPS connections
+# This prevents session hijacking attacks over unencrypted connections
 # Set to True in production when using HTTPS
-SESSION_COOKIE_SECURE = not DEBUG  # True in production, False in development
+# Set via environment variable: SESSION_COOKIE_SECURE=True
+SESSION_COOKIE_SECURE = os.environ.get('SESSION_COOKIE_SECURE', str(not DEBUG)) == 'True'
 
 # SESSION_COOKIE_HTTPONLY: Prevents JavaScript access to session cookie
 # This helps prevent XSS attacks from stealing session data
@@ -197,20 +211,37 @@ SESSION_COOKIE_AGE = 1209600  # 2 weeks
 # ----------------------------------------------------------------------------
 # HTTPS and SSL Settings (for production)
 # ----------------------------------------------------------------------------
-# SECURE_SSL_REDIRECT: Redirects all HTTP requests to HTTPS
-# Only enable in production with proper SSL certificate
-SECURE_SSL_REDIRECT = False  # Set to True in production
+# These settings enforce HTTPS connections and protect against various attacks.
+# IMPORTANT: Only enable these in production after setting up SSL/TLS certificates.
 
-# SECURE_HSTS_SECONDS: HTTP Strict Transport Security (HSTS) duration
-# Tells browsers to only use HTTPS for this domain
-# Only enable in production
-SECURE_HSTS_SECONDS = 0  # Set to 31536000 (1 year) in production
+# SECURE_SSL_REDIRECT: Redirects all HTTP requests to HTTPS
+# When True, Django automatically redirects all non-HTTPS requests to HTTPS
+# This ensures all communication is encrypted and protects against man-in-the-middle attacks
+# Set via environment variable: SECURE_SSL_REDIRECT=True
+SECURE_SSL_REDIRECT = os.environ.get('SECURE_SSL_REDIRECT', 'False') == 'True'
+
+# SECURE_HSTS_SECONDS: HTTP Strict Transport Security (HSTS) duration in seconds
+# HSTS tells browsers to only access the site via HTTPS for the specified time period
+# This prevents protocol downgrade attacks and cookie hijacking
+# Recommended value: 31536000 (1 year) for production
+# Set via environment variable: SECURE_HSTS_SECONDS=31536000
+# WARNING: Once set, browsers will cache this policy. Start with a small value for testing.
+hsts_seconds = os.environ.get('SECURE_HSTS_SECONDS', '0')
+SECURE_HSTS_SECONDS = int(hsts_seconds) if hsts_seconds.isdigit() else 0
 
 # SECURE_HSTS_INCLUDE_SUBDOMAINS: Apply HSTS to all subdomains
-SECURE_HSTS_INCLUDE_SUBDOMAINS = False  # Set to True in production
+# When True, HSTS policy applies to all subdomains of your domain
+# This provides comprehensive protection across your entire domain
+# Set via environment variable: SECURE_HSTS_INCLUDE_SUBDOMAINS=True
+SECURE_HSTS_INCLUDE_SUBDOMAINS = os.environ.get('SECURE_HSTS_INCLUDE_SUBDOMAINS', 'False') == 'True'
 
-# SECURE_HSTS_PRELOAD: Enable HSTS preload (submit to browser vendors)
-SECURE_HSTS_PRELOAD = False  # Set to True in production
+# SECURE_HSTS_PRELOAD: Enable HSTS preload
+# When True, allows your domain to be submitted to browser HSTS preload lists
+# Preloaded domains are hardcoded into browsers, providing even stronger protection
+# Only enable after thoroughly testing your HTTPS setup
+# Set via environment variable: SECURE_HSTS_PRELOAD=True
+# More info: https://hstspreload.org/
+SECURE_HSTS_PRELOAD = os.environ.get('SECURE_HSTS_PRELOAD', 'False') == 'True'
 
 # ----------------------------------------------------------------------------
 # Content Security Policy (CSP)
