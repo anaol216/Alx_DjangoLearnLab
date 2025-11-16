@@ -22,7 +22,7 @@ from django.http import HttpResponseForbidden
 from django.views.decorators.csrf import csrf_protect
 from django.db.models import Q
 from .models import Book
-from .forms import BookForm, BookSearchForm
+from .forms import BookForm, BookSearchForm, ExampleForm
 
 
 @login_required
