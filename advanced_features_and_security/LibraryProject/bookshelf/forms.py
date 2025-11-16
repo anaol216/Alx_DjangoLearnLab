@@ -174,3 +174,102 @@ class BookSearchForm(forms.Form):
         
         return query
 
+
+class ExampleForm(forms.Form):
+    """
+    Example form demonstrating security best practices.
+    
+    This form serves as a reference for implementing secure forms with:
+    - Input validation
+    - HTML escaping
+    - CSRF protection
+    - Type checking
+    - Sanitization
+    """
+    
+    name = forms.CharField(
+        max_length=100,
+        required=True,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter your name',
+            'maxlength': '100',
+        }),
+        label='Name',
+        help_text='Enter your full name (max 100 characters)',
+    )
+    
+    email = forms.EmailField(
+        max_length=254,
+        required=True,
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter your email',
+            'maxlength': '254',
+        }),
+        label='Email',
+        help_text='Enter a valid email address',
+    )
+    
+    message = forms.CharField(
+        max_length=500,
+        required=False,
+        widget=forms.Textarea(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter your message (optional)',
+            'maxlength': '500',
+            'rows': 4,
+        }),
+        label='Message',
+        help_text='Optional message (max 500 characters)',
+    )
+    
+    def clean_name(self):
+        """
+        Validate and sanitize the name field.
+        
+        Security features:
+        - Strips whitespace
+        - Validates length
+        - Checks for dangerous patterns
+        """
+        name = self.cleaned_data.get('name')
+        
+        if not name:
+            raise ValidationError('Name is required.')
+        
+        # Strip whitespace
+        name = name.strip()
+        
+        # Check minimum length
+        if len(name) < 2:
+            raise ValidationError('Name must be at least 2 characters long.')
+        
+        # Check for potentially dangerous patterns
+        dangerous_patterns = ['<script', 'javascript:', 'onerror=', 'onload=']
+        name_lower = name.lower()
+        for pattern in dangerous_patterns:
+            if pattern in name_lower:
+                raise ValidationError('Name contains invalid characters.')
+        
+        return name
+    
+    def clean_message(self):
+        """
+        Validate and sanitize the message field.
+        """
+        message = self.cleaned_data.get('message', '')
+        
+        if message:
+            # Strip whitespace
+            message = message.strip()
+            
+            # Check for dangerous patterns
+            dangerous_patterns = ['<script', 'javascript:', 'onerror=']
+            message_lower = message.lower()
+            for pattern in dangerous_patterns:
+                if pattern in message_lower:
+                    raise ValidationError('Message contains invalid characters.')
+        
+        return message
+
