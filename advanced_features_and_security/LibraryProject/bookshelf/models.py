@@ -7,7 +7,7 @@ class Book(models.Model):
     title= models.CharField(max_length=200)
     author= models.CharField(max_length=100)
     publication_year= models.IntegerField()
-class UserManager(BaseUserManager):
+class   CustomUserManager(BaseUserManager):
     def create_user(self, username, password, **extra_fields):
         if not username:
             raise ValueError('The Username field must be set')
@@ -28,6 +28,6 @@ class CustomUser(AbstractUser):
     last_name= models.CharField(max_length=100)
     date_of_birth= models.DateField()
     profile_photo= models.ImageField(upload_to='profile_photos/', null=True, blank=True)
-    objects = UserManager()
+    objects = CustomUserManager()
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['email', 'first_name', 'last_name']

@@ -16,7 +16,7 @@ class BookAdmin(admin.ModelAdmin):
 # Register the Book model with the custom admin
 admin.site.register(Book, BookAdmin)
 
-class UserAdmin(admin.ModelAdmin):
+class CustomUserAdmin(admin.ModelAdmin):
     list_display = ('email', 'first_name', 'last_name', 'date_of_birth')
     search_fields = ('email', 'first_name', 'last_name')
     list_filter = ('is_staff', 'is_active', 'is_superuser', 'date_joined', 'date_of_birth')
@@ -42,4 +42,4 @@ try:
 except admin.sites.NotRegistered:
     pass
 
-admin.site.register(User, UserAdmin)
+admin.site.register(CustomUser, CustomUserAdmin)
