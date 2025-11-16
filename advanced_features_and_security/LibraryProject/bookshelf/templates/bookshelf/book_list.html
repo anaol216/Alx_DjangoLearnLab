@@ -1,0 +1,73 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book List - Library Project</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .book-item { border: 1px solid #ddd; padding: 10px; margin: 10px 0; }
+        .search-form { margin: 20px 0; }
+        .btn { padding: 8px 16px; text-decoration: none; display: inline-block; margin: 5px; }
+        .btn-primary { background-color: #007bff; color: white; }
+        .btn-success { background-color: #28a745; color: white; }
+        .btn-danger { background-color: #dc3545; color: white; }
+        .messages { padding: 10px; margin: 10px 0; }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <h1>Book Library</h1>
+    
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="{% if message.tags == 'success' %}success{% else %}error{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    
+    <!-- Search Form with CSRF Protection -->
+    <div class="search-form">
+        <form method="get" action="{% url 'bookshelf:book_list' %}">
+            <!-- Note: GET forms don't need CSRF token, but included for consistency -->
+            {{ search_form.as_p }}
+            <button type="submit" class="btn btn-primary">Search</button>
+            <a href="{% url 'bookshelf:book_list' %}" class="btn">Clear</a>
+        </form>
+    </div>
+    
+    {% if perms.bookshelf.can_create %}
+        <a href="{% url 'bookshelf:book_create' %}" class="btn btn-success">Create New Book</a>
+    {% endif %}
+    
+    <h2>Books ({{ books|length }})</h2>
+    
+    {% if books %}
+        {% for book in books %}
+            <div class="book-item">
+                <h3><a href="{% url 'bookshelf:book_detail' book.pk %}">{{ book.title|escape }}</a></h3>
+                <p><strong>Author:</strong> {{ book.author|escape }}</p>
+                <p><strong>Year:</strong> {{ book.publication_year }}</p>
+                
+                {% if perms.bookshelf.can_edit %}
+                    <a href="{% url 'bookshelf:book_edit' book.pk %}" class="btn btn-primary">Edit</a>
+                {% endif %}
+                
+                {% if perms.bookshelf.can_delete %}
+                    <a href="{% url 'bookshelf:book_delete' book.pk %}" class="btn btn-danger">Delete</a>
+                {% endif %}
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No books found.</p>
+    {% endif %}
+    
+    <p><a href="{% url 'bookshelf:permissions_info' %}">View My Permissions</a></p>
+</body>
+</html>
+

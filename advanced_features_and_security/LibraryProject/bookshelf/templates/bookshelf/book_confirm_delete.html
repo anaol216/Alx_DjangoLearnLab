@@ -1,0 +1,42 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Book - Library Project</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; max-width: 600px; }
+        .book-info { border: 1px solid #ddd; padding: 15px; margin: 20px 0; }
+        .btn { padding: 10px 20px; text-decoration: none; display: inline-block; margin: 5px; border: none; cursor: pointer; }
+        .btn-danger { background-color: #dc3545; color: white; }
+        .btn-secondary { background-color: #6c757d; color: white; }
+        .warning { background-color: #fff3cd; color: #856404; padding: 15px; border: 1px solid #ffeaa7; }
+    </style>
+</head>
+<body>
+    <h1>Delete Book</h1>
+    
+    <div class="warning">
+        <strong>Warning:</strong> Are you sure you want to delete this book? This action cannot be undone.
+    </div>
+    
+    <div class="book-info">
+        <h3>{{ book.title|escape }}</h3>
+        <p><strong>Author:</strong> {{ book.author|escape }}</p>
+        <p><strong>Publication Year:</strong> {{ book.publication_year }}</p>
+    </div>
+    
+    <!-- Delete Form with CSRF Protection -->
+    <!-- SECURITY: {% csrf_token %} is REQUIRED for all POST forms to prevent CSRF attacks -->
+    <!-- Using POST method prevents accidental deletions via GET requests -->
+    <form method="post" action="">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Yes, Delete</button>
+        <a href="{% url 'bookshelf:book_list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+    
+    <p><small>Note: This action requires CSRF token validation for security.</small></p>
+</body>
+</html>
+

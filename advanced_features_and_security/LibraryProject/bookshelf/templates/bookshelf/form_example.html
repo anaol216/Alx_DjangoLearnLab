@@ -1,0 +1,60 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Security Example - Library Project</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; max-width: 800px; }
+        .security-note { background-color: #e7f3ff; border-left: 4px solid #2196F3; padding: 15px; margin: 20px 0; }
+        .code-block { background-color: #f5f5f5; padding: 10px; border: 1px solid #ddd; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <h1>Form Security Best Practices</h1>
+    
+    <div class="security-note">
+        <h2>CSRF Protection</h2>
+        <p>All POST forms in this application include <code>{% csrf_token %}</code> to protect against Cross-Site Request Forgery (CSRF) attacks.</p>
+        
+        <h3>Example Secure Form:</h3>
+        <div class="code-block">
+&lt;form method="post" action=""&gt;
+    {% csrf_token %}
+    &lt;!-- Form fields here --&gt;
+    &lt;button type="submit"&gt;Submit&lt;/button&gt;
+&lt;/form&gt;
+        </div>
+        
+        <h3>Why CSRF Protection is Important:</h3>
+        <ul>
+            <li>Prevents malicious websites from making unauthorized requests on behalf of users</li>
+            <li>Django automatically validates CSRF tokens on POST requests</li>
+            <li>Tokens are unique per session and expire after a period of inactivity</li>
+        </ul>
+    </div>
+    
+    <div class="security-note">
+        <h2>Input Validation</h2>
+        <p>All user input is validated using Django forms, which:</p>
+        <ul>
+            <li>Automatically escape HTML to prevent XSS attacks</li>
+            <li>Validate data types and ranges</li>
+            <li>Sanitize input before database operations</li>
+            <li>Use parameterized queries (Django ORM) to prevent SQL injection</li>
+        </ul>
+    </div>
+    
+    <div class="security-note">
+        <h2>Output Escaping</h2>
+        <p>Django templates automatically escape output. Use the <code>|escape</code> filter for user-generated content:</p>
+        <div class="code-block">
+{{ user_input|escape }}
+        </div>
+    </div>
+    
+    <p><a href="{% url 'bookshelf:book_list' %}">Back to Book List</a></p>
+</body>
+</html>
+

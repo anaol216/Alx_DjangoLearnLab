@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,12 +21,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-ex=1jz(vh14@!b$xdyt*ztqff^7+&i7pk%=f^u39aqyhw=@u&_'
+# In production, use environment variable: os.environ.get('SECRET_KEY')
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-ex=1jz(vh14@!b$xdyt*ztqff^7+&i7pk%=f^u39aqyhw=@u&_')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Set DEBUG=False in production via environment variable
+# This prevents exposing sensitive error information
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = []
+# ALLOWED_HOSTS: List of host/domain names that this Django site can serve
+# In production, set this to your actual domain names
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '').split(',') if os.environ.get('ALLOWED_HOSTS') else ['localhost', '127.0.0.1']
 
 
 # Application definition
@@ -43,13 +49,14 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
+    'django.middleware.security.SecurityMiddleware',  # Provides security enhancements
+    'bookshelf.middleware.ContentSecurityPolicyMiddleware',  # Custom CSP middleware
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',  # CSRF protection for forms
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',  # X-Frame-Options header
 ]
 
 ROOT_URLCONF = 'LibraryProject.urls'
@@ -125,3 +132,141 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# ============================================================================
+# SECURITY SETTINGS
+# ============================================================================
+# These settings enhance the security of your Django application by protecting
+# against common vulnerabilities like XSS, CSRF, clickjacking, and more.
+
+# ----------------------------------------------------------------------------
+# XSS (Cross-Site Scripting) Protection
+# ----------------------------------------------------------------------------
+# SECURE_BROWSER_XSS_FILTER: Enables browser's XSS filtering
+# This adds the X-XSS-Protection header to responses
+SECURE_BROWSER_XSS_FILTER = True
+
+# SECURE_CONTENT_TYPE_NOSNIFF: Prevents browsers from MIME-sniffing
+# This adds the X-Content-Type-Options: nosniff header
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# X_FRAME_OPTIONS: Prevents clickjacking attacks by controlling whether
+# the site can be embedded in frames/iframes
+# Options: 'DENY', 'SAMEORIGIN', 'ALLOW-FROM'
+X_FRAME_OPTIONS = 'DENY'  # Most secure: completely prevents framing
+
+# ----------------------------------------------------------------------------
+# CSRF (Cross-Site Request Forgery) Protection
+# ----------------------------------------------------------------------------
+# CSRF_COOKIE_SECURE: Ensures CSRF cookies are only sent over HTTPS
+# Set to True in production when using HTTPS
+CSRF_COOKIE_SECURE = not DEBUG  # True in production, False in development
+
+# CSRF_COOKIE_HTTPONLY: Prevents JavaScript access to CSRF cookie
+# This helps prevent XSS attacks from stealing the CSRF token
+CSRF_COOKIE_HTTPONLY = True
+
+# CSRF_COOKIE_SAMESITE: Controls when CSRF cookie is sent
+# Options: 'Strict', 'Lax', 'None'
+# 'Lax' is a good balance between security and usability
+CSRF_COOKIE_SAMESITE = 'Lax'
+
+# CSRF_TRUSTED_ORIGINS: List of trusted origins for CSRF protection
+# Add your production domain here when deploying
+CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS', '').split(',') if os.environ.get('CSRF_TRUSTED_ORIGINS') else []
+
+# ----------------------------------------------------------------------------
+# Session Security
+# ----------------------------------------------------------------------------
+# SESSION_COOKIE_SECURE: Ensures session cookies are only sent over HTTPS
+# Set to True in production when using HTTPS
+SESSION_COOKIE_SECURE = not DEBUG  # True in production, False in development
+
+# SESSION_COOKIE_HTTPONLY: Prevents JavaScript access to session cookie
+# This helps prevent XSS attacks from stealing session data
+SESSION_COOKIE_HTTPONLY = True
+
+# SESSION_COOKIE_SAMESITE: Controls when session cookie is sent
+# 'Lax' is a good balance between security and usability
+SESSION_COOKIE_SAMESITE = 'Lax'
+
+# SESSION_COOKIE_AGE: Session timeout in seconds (default: 2 weeks)
+# Consider reducing this for more sensitive applications
+SESSION_COOKIE_AGE = 1209600  # 2 weeks
+
+# ----------------------------------------------------------------------------
+# HTTPS and SSL Settings (for production)
+# ----------------------------------------------------------------------------
+# SECURE_SSL_REDIRECT: Redirects all HTTP requests to HTTPS
+# Only enable in production with proper SSL certificate
+SECURE_SSL_REDIRECT = False  # Set to True in production
+
+# SECURE_HSTS_SECONDS: HTTP Strict Transport Security (HSTS) duration
+# Tells browsers to only use HTTPS for this domain
+# Only enable in production
+SECURE_HSTS_SECONDS = 0  # Set to 31536000 (1 year) in production
+
+# SECURE_HSTS_INCLUDE_SUBDOMAINS: Apply HSTS to all subdomains
+SECURE_HSTS_INCLUDE_SUBDOMAINS = False  # Set to True in production
+
+# SECURE_HSTS_PRELOAD: Enable HSTS preload (submit to browser vendors)
+SECURE_HSTS_PRELOAD = False  # Set to True in production
+
+# ----------------------------------------------------------------------------
+# Content Security Policy (CSP)
+# ----------------------------------------------------------------------------
+# CSP helps prevent XSS attacks by specifying which domains can load resources
+# We'll implement this via middleware (see middleware.py or custom middleware)
+
+# CSP settings (if using django-csp package, uncomment and configure):
+# CSP_DEFAULT_SRC = ["'self'"]
+# CSP_SCRIPT_SRC = ["'self'", "'unsafe-inline'"]  # Remove 'unsafe-inline' in production
+# CSP_STYLE_SRC = ["'self'", "'unsafe-inline'"]  # Remove 'unsafe-inline' in production
+# CSP_IMG_SRC = ["'self'", "data:", "https:"]
+# CSP_FONT_SRC = ["'self'"]
+# CSP_CONNECT_SRC = ["'self'"]
+
+# For now, we'll set CSP headers manually in a custom middleware
+# See bookshelf/middleware.py for implementation
+
+# ----------------------------------------------------------------------------
+# Additional Security Headers
+# ----------------------------------------------------------------------------
+# SECURE_REFERRER_POLICY: Controls Referer header
+# Options: 'no-referrer', 'no-referrer-when-downgrade', 'origin', etc.
+SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
+
+# ----------------------------------------------------------------------------
+# Password Security
+# ----------------------------------------------------------------------------
+# Password validators are already configured above
+# Additional settings:
+# PASSWORD_RESET_TIMEOUT: Time in seconds for password reset links (default: 259200 = 3 days)
+PASSWORD_RESET_TIMEOUT = 259200
+
+# ----------------------------------------------------------------------------
+# File Upload Security
+# ----------------------------------------------------------------------------
+# DATA_UPLOAD_MAX_MEMORY_SIZE: Maximum size for file uploads (default: 2.5MB)
+DATA_UPLOAD_MAX_MEMORY_SIZE = 2621440  # 2.5 MB
+
+# FILE_UPLOAD_MAX_MEMORY_SIZE: Maximum size for in-memory file uploads
+FILE_UPLOAD_MAX_MEMORY_SIZE = 2621440  # 2.5 MB
+
+# FILE_UPLOAD_PERMISSIONS: File permissions for uploaded files (0o644 = rw-r--r--)
+FILE_UPLOAD_PERMISSIONS = 0o644
+
+# ----------------------------------------------------------------------------
+# Security Notes for Production Deployment
+# ----------------------------------------------------------------------------
+# Before deploying to production, ensure:
+# 1. DEBUG = False
+# 2. Set SECRET_KEY via environment variable
+# 3. Configure ALLOWED_HOSTS with your domain
+# 4. Enable HTTPS and set SECURE_SSL_REDIRECT = True
+# 5. Set CSRF_COOKIE_SECURE = True
+# 6. Set SESSION_COOKIE_SECURE = True
+# 7. Configure SECURE_HSTS_SECONDS
+# 8. Remove 'unsafe-inline' from CSP directives
+# 9. Use a proper web server (nginx, Apache) in front of Django
+# 10. Keep Django and all dependencies updated
