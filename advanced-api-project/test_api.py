@@ -59,12 +59,12 @@ def test_create_book():
     return None
 
 def test_update_book(book_id):
-    """Test PUT /api/books/<id>/update/"""
-    print(f"\n4. Testing PATCH /api/books/{book_id}/update/ (Update book)")
+    """Test PUT /api/books/update/<id>/"""
+    print(f"\n4. Testing PATCH /api/books/update/{book_id}/ (Update book)")
     data = {
         "title": "Updated Test Book"
     }
-    response = requests.patch(f"{BASE_URL}/books/{book_id}/update/", json=data)
+    response = requests.patch(f"{BASE_URL}/books/update/{book_id}/", json=data)
     print(f"   Status Code: {response.status_code}")
     if response.status_code == 200:
         book = response.json()
@@ -74,9 +74,9 @@ def test_update_book(book_id):
     return response
 
 def test_delete_book(book_id):
-    """Test DELETE /api/books/<id>/delete/"""
-    print(f"\n5. Testing DELETE /api/books/{book_id}/delete/ (Delete book)")
-    response = requests.delete(f"{BASE_URL}/books/{book_id}/delete/")
+    """Test DELETE /api/books/delete/<id>/"""
+    print(f"\n5. Testing DELETE /api/books/delete/{book_id}/ (Delete book)")
+    response = requests.delete(f"{BASE_URL}/books/delete/{book_id}/")
     print(f"   Status Code: {response.status_code}")
     if response.status_code == 204:
         print("   ✓ Book deleted successfully")

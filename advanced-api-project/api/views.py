@@ -7,7 +7,7 @@ permissions and customizations.
 """
 
 from rest_framework import generics, filters
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Book
 from .serializers import BookSerializer
@@ -71,7 +71,7 @@ class BookCreateView(generics.CreateAPIView):
     is not in the future.
     
     Permissions:
-        - IsAuthenticatedOrReadOnly: Only authenticated users can create books.
+        - IsAuthenticated: Only authenticated users can create books.
     
     Validation:
         - All fields are validated by BookSerializer
@@ -89,7 +89,7 @@ class BookCreateView(generics.CreateAPIView):
     """
     queryset = Book.objects.all()
     serializer_class = BookSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticated]
     
     def perform_create(self, serializer):
         """
@@ -111,13 +111,13 @@ class BookUpdateView(generics.UpdateAPIView):
     Supports both full updates (PUT) and partial updates (PATCH).
     
     Permissions:
-        - IsAuthenticatedOrReadOnly: Only authenticated users can update books.
+        - IsAuthenticated: Only authenticated users can update books.
     
     Validation:
         - All fields are validated by BookSerializer
         - Custom validation ensures publication_year is not in the future
     
-    Endpoint: PUT/PATCH /api/books/<int:pk>/update/
+    Endpoint: PUT/PATCH /api/books/update/<int:pk>/
     
     Parameters:
         pk (int): Primary key of the book to update
@@ -136,7 +136,7 @@ class BookUpdateView(generics.UpdateAPIView):
     """
     queryset = Book.objects.all()
     serializer_class = BookSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticated]
     
     def perform_update(self, serializer):
         """
@@ -157,9 +157,9 @@ class BookDeleteView(generics.DestroyAPIView):
     This view allows authenticated users to delete book instances.
     
     Permissions:
-        - IsAuthenticatedOrReadOnly: Only authenticated users can delete books.
+        - IsAuthenticated: Only authenticated users can delete books.
     
-    Endpoint: DELETE /api/books/<int:pk>/delete/
+    Endpoint: DELETE /api/books/delete/<int:pk>/
     
     Parameters:
         pk (int): Primary key of the book to delete
@@ -171,7 +171,7 @@ class BookDeleteView(generics.DestroyAPIView):
     """
     queryset = Book.objects.all()
     serializer_class = BookSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticated]
     
     def perform_destroy(self, instance):
         """
