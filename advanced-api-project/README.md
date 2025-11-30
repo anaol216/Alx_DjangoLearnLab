@@ -209,6 +209,14 @@ python manage.py runserver
 2. Use the built-in forms to test endpoints
 3. Login via the admin panel to test write operations
 
+### Using Django Test Suite
+
+Run the comprehensive unit tests covering CRUD, permissions, and filtering:
+
+```bash
+python manage.py test api
+```
+
 ### Using the Test Script
 
 ```bash
