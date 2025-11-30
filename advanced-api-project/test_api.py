@@ -104,6 +104,26 @@ def test_searching():
         print(f"   Found {len(books)} books matching 'Harry'")
     return response
 
+def test_advanced_filtering():
+    """Test advanced filtering and searching"""
+    print("\n8. Testing Advanced Filtering & Searching")
+    
+    # Filter by title
+    print("   Testing Filter by Title (title='The Hobbit')")
+    response = requests.get(f"{BASE_URL}/books/?title=The Hobbit")
+    if response.status_code == 200 and len(response.json()) > 0:
+        print("   ✓ Filter by title working")
+    else:
+        print("   ✗ Filter by title failed")
+
+    # Search by author name
+    print("   Testing Search by Author Name (search='Rowling')")
+    response = requests.get(f"{BASE_URL}/books/?search=Rowling")
+    if response.status_code == 200 and len(response.json()) > 0:
+        print("   ✓ Search by author name working")
+    else:
+        print("   ✗ Search by author name failed")
+
 if __name__ == "__main__":
     try:
         # Test read operations (should work without authentication)
@@ -111,6 +131,7 @@ if __name__ == "__main__":
         test_get_book_detail(1)
         test_filtering()
         test_searching()
+        test_advanced_filtering()
         
         # Test write operations (will require authentication)
         print("\n" + "=" * 60)

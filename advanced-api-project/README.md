@@ -105,7 +105,6 @@ Content-Type: application/json
 ## Filtering, Searching & Ordering
 
 ### Filter by Author
-
 ```http
 GET /api/books/?author=1
 ```
@@ -116,10 +115,16 @@ GET /api/books/?author=1
 GET /api/books/?publication_year=1997
 ```
 
-### Search by Title
+### Filter by Title
 
 ```http
-GET /api/books/?search=Harry
+GET /api/books/?title=Harry%20Potter
+```
+
+### Search by Title or Author Name
+
+```http
+GET /api/books/?search=Rowling
 ```
 
 ### Order by Title
@@ -144,10 +149,10 @@ GET /api/books/?author=1&ordering=-publication_year&search=Harry
 
 ## Permissions
 
-The API uses `IsAuthenticatedOrReadOnly` permission class:
+The API uses two permission classes:
 
-- **Read Operations (GET)**: Available to everyone (authenticated and unauthenticated users)
-- **Write Operations (POST, PUT, PATCH, DELETE)**: Require authentication
+- **`IsAuthenticatedOrReadOnly`**: Applied to List and Detail views. Allows read-only access to unauthenticated users.
+- **`IsAuthenticated`**: Applied to Create, Update, and Delete views. Strictly enforces authentication for all operations.
 
 ### Authentication Methods
 
@@ -286,7 +291,9 @@ All views use Django REST Framework's generic views:
 - **Filtering**: By author and publication_year
 - **Searching**: By title
 - **Ordering**: By title and publication_year
-- **Permissions**: IsAuthenticatedOrReadOnly
+- **Permissions**:
+  - `IsAuthenticatedOrReadOnly` for List and Detail views
+  - `IsAuthenticated` for Create, Update, and Delete views
 
 ---
 
