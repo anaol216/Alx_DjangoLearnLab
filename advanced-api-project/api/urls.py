@@ -28,10 +28,10 @@ urlpatterns = [
     path('books/create/', BookCreateView.as_view(), name='book-create'),
     
     # Update an existing book
-    # PUT/PATCH /api/books/<int:pk>/update/
-    path('books/<int:pk>/update/', BookUpdateView.as_view(), name='book-update'),
+    # PUT/PATCH /api/books/update/<int:pk>/
+    path('books/update/<int:pk>/', BookUpdateView.as_view(), name='book-update'),
     
     # Delete a book
-    # DELETE /api/books/<int:pk>/delete/
-    path('books/<int:pk>/delete/', BookDeleteView.as_view(), name='book-delete'),
+    # DELETE /api/books/delete/<int:pk>/
+    path('books/delete/<int:pk>/', BookDeleteView.as_view(), name='book-delete'),
 ]

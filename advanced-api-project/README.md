@@ -23,8 +23,8 @@ A comprehensive RESTful API built with Django REST Framework for managing books 
 | GET | `/api/books/` | List all books | Optional |
 | GET | `/api/books/<id>/` | Get book details | Optional |
 | POST | `/api/books/create/` | Create new book | Required |
-| PUT/PATCH | `/api/books/<id>/update/` | Update book | Required |
-| DELETE | `/api/books/<id>/delete/` | Delete book | Required |
+| PUT/PATCH | `/api/books/update/<id>/` | Update book | Required |
+| DELETE | `/api/books/delete/<id>/` | Delete book | Required |
 
 ---
 
@@ -101,42 +101,6 @@ Content-Type: application/json
 ```json
 {
     "publication_year": [
-        "Publication year cannot be in the future. Current year is 2025."
-    ]
-}
-```
-
-### 4. Update Book
-
-```http
-PATCH /api/books/1/update/
-Content-Type: application/json
-
-{
-    "title": "Updated Title"
-}
-```
-
-**Response (200 OK):**
-
-```json
-{
-    "id": 1,
-    "title": "Updated Title",
-    "publication_year": 1997,
-    "author": 1
-}
-```
-
-### 5. Delete Book
-
-```http
-DELETE /api/books/1/delete/
-```
-
-**Response (204 No Content)**
-
----
 
 ## Filtering, Searching & Ordering
 
