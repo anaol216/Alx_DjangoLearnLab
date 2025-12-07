@@ -8,17 +8,7 @@ publication date, and author information.
 
 from django.db import models
 from django.contrib.auth.models import User
-
-
-
-class Tag(models.Model):
-    """
-    Represents a tag for blog posts.
-    """
-    name = models.CharField(max_length=50, unique=True)
-    
-    def __str__(self):
-        return self.name
+from taggit.managers import TaggableManager
 
 
 class Post(models.Model):
@@ -30,7 +20,6 @@ class Post(models.Model):
         content (TextField): The main content/body of the blog post.
         published_date (DateTimeField): Auto-set timestamp when post is created.
         author (ForeignKey): Reference to the User who authored the post.
-        tags (ManyToManyField): Tags associated with the post.
     
     The author field uses CASCADE deletion, meaning if a user is deleted,
     all their posts will also be deleted.
@@ -39,7 +28,7 @@ class Post(models.Model):
     content = models.TextField()
     published_date = models.DateTimeField(auto_now_add=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts')
-    tags = models.ManyToManyField(Tag, related_name='posts', blank=True)
+    tags = TaggableManager()
     
     class Meta:
         ordering = ['-published_date']  # Newest posts first

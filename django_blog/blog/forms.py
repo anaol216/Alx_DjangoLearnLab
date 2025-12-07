@@ -8,11 +8,7 @@ and blog post creation/editing.
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-<<<<<<< HEAD
-from .models import Post, Comment, Tag
-=======
 from .models import Post, Comment
->>>>>>> 482b9eaeb153fb3b0dc7e02dc4eab126209c23f5
 
 
 class CustomUserCreationForm(UserCreationForm):
@@ -79,21 +75,12 @@ class PostForm(forms.ModelForm):
     """
     Form for creating and editing blog posts.
     
-    Includes fields for title and content. The author is automatically
-    set based on the logged-in user in the view.
+    Includes fields for title, content, and tags. 
+    The author is automatically set in the view.
     """
-    tags = forms.CharField(
-        required=False,
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Enter tags, separated by commas (e.g., tech, python)'
-        }),
-        help_text='Separate tags with commas.'
-    )
-
     class Meta:
         model = Post
-        fields = ['title', 'content']
+        fields = ['title', 'content', 'tags']
         widgets = {
             'title': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -104,40 +91,9 @@ class PostForm(forms.ModelForm):
                 'placeholder': 'Write your post content here...',
                 'rows': 10
             }),
-        }
-    
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if self.instance.pk:
-            # Populate tags field with existing tags
-            self.fields['tags'].initial = ', '.join([tag.name for tag in self.instance.tags.all()])
-    
-    def save(self, commit=True):
-        instance = super().save(commit=False)
-        if commit:
-            instance.save()
-            # Process tags
-            tag_names = [name.strip() for name in self.cleaned_data['tags'].split(',') if name.strip()]
-            new_tags = []
-            for name in tag_names:
-                tag, created = Tag.objects.get_or_create(name=name)
-                new_tags.append(tag)
-            instance.tags.set(new_tags)
-        return instance
-
-
-class CommentForm(forms.ModelForm):
-    """
-    Form for creating and editing comments.
-    """
-    class Meta:
-        model = Comment
-        fields = ['content']
-        widgets = {
-            'content': forms.Textarea(attrs={
+            'tags': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Add a comment...',
-                'rows': 3
+                'placeholder': 'Enter tags, separated by commas'
             }),
         }
 
@@ -156,4 +112,3 @@ class CommentForm(forms.ModelForm):
                 'rows': 3
             }),
         }
-

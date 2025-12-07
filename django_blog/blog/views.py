@@ -12,6 +12,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib import messages
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy, reverse
+from django.db.models import Q
+from taggit.models import Tag
 from .models import Post, Comment
 from .forms import CustomUserCreationForm, UserUpdateForm, CommentForm
 
@@ -88,7 +90,7 @@ class PostDetailView(DetailView):
 class PostCreateView(LoginRequiredMixin, CreateView):
     """Create a new blog post."""
     model = Post
-    fields = ['title', 'content']
+    fields = ['title', 'content', 'tags']
     template_name = 'blog/post_form.html'
     
     def form_valid(self, form):
@@ -103,7 +105,7 @@ class PostCreateView(LoginRequiredMixin, CreateView):
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     """Update an existing blog post."""
     model = Post
-    fields = ['title', 'content']
+    fields = ['title', 'content', 'tags']
     template_name = 'blog/post_form.html'
     
     def form_valid(self, form):
@@ -141,13 +143,9 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 class CommentCreateView(LoginRequiredMixin, CreateView):
     """
     Create a new comment on a post.
-    Handles the submission from the post detail page or a separate form.
     """
     model = Comment
     form_class = CommentForm
-    # We don't need a template_name if we redirect back to detail view on error,
-    # but generic views usually expect one.
-    # However, we'll mostly use this via the detail view or a dedicated simple form page if needed.
     template_name = 'blog/comment_form.html' 
     
     def form_valid(self, form):
@@ -190,16 +188,11 @@ class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     template_name = 'blog/comment_confirm_delete.html'
     
     def get_success_url(self):
-        # We need to get the post PK before deletion, which happens in delete()
-        # But get_success_url is called after objects deletion usually or before.
-        # Safe way is to store post pk in delete method or use self.object.post.pk if available.
         return reverse('post-detail', kwargs={'pk': self.object.post.pk})
     
     def test_func(self):
         comment = self.get_object()
         return self.request.user == comment.author
-    
-<<<<<<< HEAD
     
     def delete(self, request, *args, **kwargs):
         messages.success(request, 'Comment deleted successfully')
@@ -210,13 +203,10 @@ class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 # Search and Tag Views
 # ============================================================================
 
-from django.db.models import Q
-from .models import Tag
-
 class SearchResultView(ListView):
     """
     Search results view.
-    Filters posts by title, content, or tags based on search query.
+    Filters posts by title, content, or tags.
     """
     model = Post
     template_name = 'blog/search_results.html'
@@ -249,15 +239,10 @@ class PostByTagListView(ListView):
     
     def get_queryset(self):
         tag_slug = self.kwargs.get('tag_slug')
-        self.tag = get_object_or_404(Tag, name=tag_slug)
+        self.tag = get_object_or_404(Tag, slug=tag_slug)
         return Post.objects.filter(tags=self.tag).order_by('-published_date')
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['tag'] = self.tag
         return context
-=======
-    def delete(self, request, *args, **kwargs):
-        messages.success(request, 'Comment deleted successfully')
-        return super().delete(request, *args, **kwargs)
->>>>>>> 482b9eaeb153fb3b0dc7e02dc4eab126209c23f5
