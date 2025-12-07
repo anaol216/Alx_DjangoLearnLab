@@ -14,6 +14,7 @@
                 <a href="{% url 'home' %}" class="logo">Django Blog</a>
                 <ul class="nav-links">
                     <li><a href="{% url 'home' %}">Home</a></li>
+                    <li><a href="{% url 'post-list' %}">Posts</a></li>
                     {% if user.is_authenticated %}
                         <li><a href="{% url 'profile' %}">Profile</a></li>
                         <li><a href="{% url 'logout' %}">Logout</a></li>

@@ -1,13 +1,14 @@
 """
-Forms for user authentication and profile management.
+Forms for user authentication, profile management, and blog posts.
 
-This module contains custom forms for user registration and profile editing,
-extending Django's built-in forms with additional fields.
+This module contains custom forms for user registration, profile editing,
+and blog post creation/editing.
 """
 
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from .models import Post
 
 
 class CustomUserCreationForm(UserCreationForm):
@@ -68,3 +69,27 @@ class UserUpdateForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         for field_name, field in self.fields.items():
             field.widget.attrs['class'] = 'form-control'
+
+
+class PostForm(forms.ModelForm):
+    """
+    Form for creating and editing blog posts.
+    
+    Includes fields for title and content. The author is automatically
+    set based on the logged-in user in the view.
+    """
+    class Meta:
+        model = Post
+        fields = ['title', 'content']
+        widgets = {
+            'title': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter post title'
+            }),
+            'content': forms.Textarea(attrs={
+                'class': 'form-control',
+                'placeholder': 'Write your post content here...',
+                'rows': 10
+            }),
+        }
+
