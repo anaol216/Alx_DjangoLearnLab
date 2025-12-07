@@ -8,7 +8,7 @@ and blog post creation/editing.
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Post
+from .models import Post, Comment
 
 
 class CustomUserCreationForm(UserCreationForm):
@@ -90,6 +90,22 @@ class PostForm(forms.ModelForm):
                 'class': 'form-control',
                 'placeholder': 'Write your post content here...',
                 'rows': 10
+            }),
+        }
+
+
+class CommentForm(forms.ModelForm):
+    """
+    Form for creating and editing comments.
+    """
+    class Meta:
+        model = Comment
+        fields = ['content']
+        widgets = {
+            'content': forms.Textarea(attrs={
+                'class': 'form-control',
+                'placeholder': 'Add a comment...',
+                'rows': 3
             }),
         }
 

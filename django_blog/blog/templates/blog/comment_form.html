@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if object %}Edit Comment{% else %}Add Comment{% endif %} - Django Blog{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <div class="form-card">
+        <h2>{% if object %}Edit Comment{% else %}Add Comment{% endif %}</h2>
+        <p class="form-subtitle">
+            {% if object %}
+            Update your comment on "{{ object.post.title }}"
+            {% else %}
+            Share your thoughts on "{{ post.title }}"
+            {% endif %}
+        </p>
+        
+        <form method="post">
+            {% csrf_token %}
+            
+            {% if form.errors %}
+            <div class="alert alert-danger">
+                <p>Please correct the errors below:</p>
+            </div>
+            {% endif %}
+            
+            <div class="form-group">
+                <label for="id_content">Comment</label>
+                {{ form.content }}
+                {% if form.content.errors %}
+                <span class="error-text">{{ form.content.errors.0 }}</span>
+                {% endif %}
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    {% if object %}Update Comment{% else %}Post Comment{% endif %}
+                </button>
+                <a href="{% if object %}{% url 'post-detail' object.post.pk %}{% else %}{% url 'post-detail' post.pk %}{% endif %}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

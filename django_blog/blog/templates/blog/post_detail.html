@@ -26,5 +26,48 @@
     <div class="post-navigation">
         <a href="{% url 'post-list' %}" class="btn btn-secondary">← Back to All Posts</a>
     </div>
+    
+    <div class="comments-section" id="comments">
+        <h3>Comments ({{ comments.count }})</h3>
+        
+        {% if user.is_authenticated %}
+        <div class="comment-form-section">
+            <h4>Leave a comment</h4>
+            <form action="{% url 'comment-create' post.pk %}" method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    {{ comment_form.content }}
+                </div>
+                <button type="submit" class="btn btn-primary">Post Comment</button>
+            </form>
+        </div>
+        {% else %}
+        <div class="login-prompt">
+            <p>Please <a href="{% url 'login' %}?next={{ request.path }}">login</a> to leave a comment.</p>
+        </div>
+        {% endif %}
+        
+        <div class="comment-list">
+            {% for comment in comments %}
+            <div class="comment-card">
+                <div class="comment-header">
+                    <strong>{{ comment.author.username }}</strong>
+                    <span class="comment-date">{{ comment.created_at|date:"F d, Y H:i" }}</span>
+                    {% if comment.user == user or comment.author == user %}
+                    <div class="comment-actions">
+                        <a href="{% url 'comment-update' comment.pk %}" class="comment-action-link">Edit</a>
+                        <a href="{% url 'comment-delete' comment.pk %}" class="comment-action-link text-danger">Delete</a>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="comment-body">
+                    {{ comment.content|linebreaks }}
+                </div>
+            </div>
+            {% empty %}
+            <p class="no-comments">No comments yet.</p>
+            {% endfor %}
+        </div>
+    </div>
 </article>
 {% endblock %}
