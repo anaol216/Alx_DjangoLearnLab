@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - Django Blog{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <h1 class="page-title">Welcome to Django Blog</h1>
+    <p class="page-subtitle">A modern blogging platform built with Django</p>
+</div>
+
+<div class="post-list">
+    {% for post in posts %}
+    <article class="post-card">
+        <h2><a href="#">{{ post.title }}</a></h2>
+        <p class="post-meta">
+            By {{ post.author.username }} | {{ post.published_date|date:"F d, Y" }}
+        </p>
+        <p class="post-excerpt">{{ post.content|truncatewords:30 }}</p>
+        <a href="#" class="read-more">Read More →</a>
+    </article>
+    {% empty %}
+    <div class="no-posts">
+        <p>No posts yet. Be the first to share your thoughts!</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

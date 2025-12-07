@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Django Blog{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'blog/css/style.css' %}" />
+  </head>
+  <body>
+    <header>
+      <nav class="navbar">
+        <div class="container">
+          <a href="/" class="logo">Django Blog</a>
+          <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            {% if user.is_authenticated %}
+            <li><a href="#">My Posts</a></li>
+            <li><a href="#">Profile</a></li>
+            <li><a href="#">Logout</a></li>
+            {% else %}
+            <li><a href="#">Login</a></li>
+            <li><a href="#">Register</a></li>
+            {% endif %}
+          </ul>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container">{% block content %} {% endblock %}</main>
+
+    <footer>
+      <div class="container">
+        <p>&copy; 2024 Django Blog. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script src="{% static 'blog/js/main.js' %}"></script>
+  </body>
+</html>
