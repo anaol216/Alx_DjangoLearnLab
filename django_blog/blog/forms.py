@@ -8,7 +8,7 @@ and blog post creation/editing.
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from taggit.forms import TagWidget
+from taggit.forms import TagWidget, TagField
 from .models import Post, Comment
 
 
@@ -79,6 +79,8 @@ class PostForm(forms.ModelForm):
     Includes fields for title, content, and tags. 
     The author is automatically set in the view.
     """
+    tags = TagField(widget=TagWidget(), required=False)
+
     class Meta:
         model = Post
         fields = ['title', 'content', 'tags']
@@ -92,11 +94,14 @@ class PostForm(forms.ModelForm):
                 'placeholder': 'Write your post content here...',
                 'rows': 10
             }),
-            'tags': TagWidget(attrs={
-                'class': 'form-control',
-                'placeholder': 'Enter tags, separated by commas'
-            }),
         }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['tags'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'Enter tags, separated by commas'
+        })
 
 
 class CommentForm(forms.ModelForm):
