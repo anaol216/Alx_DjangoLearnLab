@@ -10,6 +10,17 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
+
+class Tag(models.Model):
+    """
+    Represents a tag for blog posts.
+    """
+    name = models.CharField(max_length=50, unique=True)
+    
+    def __str__(self):
+        return self.name
+
+
 class Post(models.Model):
     """
     Represents a blog post.
@@ -19,6 +30,7 @@ class Post(models.Model):
         content (TextField): The main content/body of the blog post.
         published_date (DateTimeField): Auto-set timestamp when post is created.
         author (ForeignKey): Reference to the User who authored the post.
+        tags (ManyToManyField): Tags associated with the post.
     
     The author field uses CASCADE deletion, meaning if a user is deleted,
     all their posts will also be deleted.
@@ -27,9 +39,34 @@ class Post(models.Model):
     content = models.TextField()
     published_date = models.DateTimeField(auto_now_add=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts')
+    tags = models.ManyToManyField(Tag, related_name='posts', blank=True)
     
     class Meta:
         ordering = ['-published_date']  # Newest posts first
     
     def __str__(self):
         return self.title
+
+
+class Comment(models.Model):
+    """
+    Represents a comment on a blog Post.
+    
+    Attributes:
+        post: Reference to the Post the comment belongs to.
+        author: Reference to the User who wrote the comment.
+        content: The text content of the comment.
+        created_at: Timestamp when comment was created.
+        updated_at: Timestamp when comment was last updated.
+    """
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['created_at']
+        
+    def __str__(self):
+        return f"Comment by {self.author} on {self.post}"

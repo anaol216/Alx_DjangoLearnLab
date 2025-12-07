@@ -16,6 +16,15 @@
         {{ post.content|linebreaks }}
     </div>
     
+    {% if post.tags.all %}
+    <div class="post-tags-detail" style="margin: 1rem 0;">
+        <strong>Tags:</strong>
+        {% for tag in post.tags.all %}
+        <a href="{% url 'post-by-tag' tag.name %}" class="tag-badge" style="display: inline-block; padding: 0.2rem 0.5rem; margin-right: 0.5rem; background: #e9ecef; border-radius: 4px; text-decoration: none; color: #333; font-size: 0.9em;">{{ tag.name }}</a>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
     {% if user == post.author %}
     <div class="post-actions">
         <a href="{% url 'post-update' post.pk %}" class="btn btn-secondary">Edit Post</a>
@@ -25,6 +34,49 @@
     
     <div class="post-navigation">
         <a href="{% url 'post-list' %}" class="btn btn-secondary">← Back to All Posts</a>
+    </div>
+    
+    <div class="comments-section" id="comments">
+        <h3>Comments ({{ comments.count }})</h3>
+        
+        {% if user.is_authenticated %}
+        <div class="comment-form-section">
+            <h4>Leave a comment</h4>
+            <form action="{% url 'comment-create' post.pk %}" method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    {{ comment_form.content }}
+                </div>
+                <button type="submit" class="btn btn-primary">Post Comment</button>
+            </form>
+        </div>
+        {% else %}
+        <div class="login-prompt">
+            <p>Please <a href="{% url 'login' %}?next={{ request.path }}">login</a> to leave a comment.</p>
+        </div>
+        {% endif %}
+        
+        <div class="comment-list">
+            {% for comment in comments %}
+            <div class="comment-card">
+                <div class="comment-header">
+                    <strong>{{ comment.author.username }}</strong>
+                    <span class="comment-date">{{ comment.created_at|date:"F d, Y H:i" }}</span>
+                    {% if comment.user == user or comment.author == user %}
+                    <div class="comment-actions">
+                        <a href="{% url 'comment-update' comment.pk %}" class="comment-action-link">Edit</a>
+                        <a href="{% url 'comment-delete' comment.pk %}" class="comment-action-link text-danger">Delete</a>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="comment-body">
+                    {{ comment.content|linebreaks }}
+                </div>
+            </div>
+            {% empty %}
+            <p class="no-comments">No comments yet.</p>
+            {% endfor %}
+        </div>
     </div>
 </article>
 {% endblock %}
