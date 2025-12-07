@@ -199,6 +199,7 @@ class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         comment = self.get_object()
         return self.request.user == comment.author
     
+<<<<<<< HEAD
     
     def delete(self, request, *args, **kwargs):
         messages.success(request, 'Comment deleted successfully')
@@ -255,3 +256,8 @@ class PostByTagListView(ListView):
         context = super().get_context_data(**kwargs)
         context['tag'] = self.tag
         return context
+=======
+    def delete(self, request, *args, **kwargs):
+        messages.success(request, 'Comment deleted successfully')
+        return super().delete(request, *args, **kwargs)
+>>>>>>> 482b9eaeb153fb3b0dc7e02dc4eab126209c23f5
