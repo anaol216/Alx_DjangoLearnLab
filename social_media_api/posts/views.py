@@ -1,6 +1,9 @@
 from rest_framework import generics, permissions
 from .models import Post
 from .serializers import PostSerializer
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 class FeedView(generics.ListAPIView):
     serializer_class = PostSerializer
