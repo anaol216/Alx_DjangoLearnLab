@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-!0#2wbz5(b@9gh8_y9!2kf19bi0@#+m2!%@ed64gb$_ss*9&d5'
+SECRET_KEY = 'django-insecure-s(=ut1i$qw#=@f#t_^8$ud+-702j#m*bu93z-kr3tryb+5p=n_'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -30,7 +30,10 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
+
 INSTALLED_APPS = [
+    'accounts',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -40,10 +43,8 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'rest_framework.authtoken',
-
-
-    'accounts',
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -127,13 +128,12 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-#  Custom User Model
-AUTH_USER_MODEL = 'accounts.User'
+# Custom User Model
+AUTH_USER_MODEL = 'accounts.CustomUser'
 
-
-# Django REST Framework Configuration
+# REST Framework Configuration
 REST_FRAMEWORK = {
-'DEFAULT_AUTHENTICATION_CLASSES': [
-'rest_framework.authentication.TokenAuthentication',
-],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
 }
